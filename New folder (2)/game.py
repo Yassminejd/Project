@@ -29,10 +29,13 @@ CopPosy = 100
 CopSpeed = 1
 obsPosx = 200
 obsPosy = 200
+obsSpeed = 3
 obs2Posx = 400
 obs2Posy = 400
+obs2Speed = 3
 obs3Posx =700
 obs3Posy = 700
+obs3Speed = 3
 
 
 
@@ -59,6 +62,15 @@ while game:
     if keys[K_DOWN] and GuyPosy < SCREEN_HEIGHT - GuySize[1]:
         GuyPosy += GuySpeed
         
+    obsPosx += obsSpeed
+    if obsPosx <= 0 or obsPosx >= SCREEN_WIDTH - 150:
+        obsSpeed *= -1
+    obs2Posy += obs2Speed
+    if obs2Posy <= 0 or obs2Posy >= SCREEN_HEIGHT - 150:
+        obs2Speed *= -1
+    obs3Posy += obs3Speed
+    if obs3Posy <= 0 or obs3Posy >= SCREEN_HEIGHT - 150:
+        obs3Speed *= -1
 
     window.blit(background, (0, 0))
     window.blit(Guy, (GuyPosx, GuyPosy))
