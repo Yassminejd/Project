@@ -20,7 +20,7 @@ obs2 = transform.scale(image.load('obs2.png'),(70,70))
 # Player properties
 GuyPosx = SCREEN_WIDTH // 2 
 GuyPosy = SCREEN_HEIGHT // 2 
-GuySpeed = 1
+GuySpeed = 2
 
 
 CopPosx = 100
