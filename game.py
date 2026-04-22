@@ -9,32 +9,32 @@ display.set_caption('Catch Me If You Can')
 
 background = transform.scale(image.load('Background.png'), Size)
 
-GuySize  = (150, 200 )
+ZombieSize  = (150, 200 )
 CopSize = (200, 200)
 
-Guy = transform.scale(image.load('Guy.png'), GuySize)
+Zombie = transform.scale(image.load('Zombie.png'), ZombieSize)
 Cop = transform.scale( image.load('Cop.png') , CopSize )
-obs = transform.scale(image.load('obs.png'),(70, 70))
+obs = transform.scale(image.load('obs.png'),(100,100))
 obs2 = transform.scale(image.load('obs2.png'),(70,70))
 
 # Player properties
-GuyPosx = SCREEN_WIDTH // 2 
-GuyPosy = SCREEN_HEIGHT // 2 
-GuySpeed = 2
+ZombiePosx = SCREEN_WIDTH // 2 
+ZombiePosy = SCREEN_HEIGHT // 2 
+ZombieSpeed = 7
 
 
 CopPosx = 100
 CopPosy = 100
-CopSpeed = 1
+CopSpeed = 7
 obsPosx = 200
 obsPosy = 200
-obsSpeed = 3
+obsSpeed = 5
 obs2Posx = 400
 obs2Posy = 400
-obs2Speed = 3
+obs2Speed = 5
 obs3Posx =700
 obs3Posy = 700
-obs3Speed = 3
+obs3Speed = 5
 
 
 
@@ -52,15 +52,16 @@ while game:
 
     #detect keys
     keys = key.get_pressed()
-    if keys[K_LEFT] and GuyPosx > 0:
-        GuyPosx -= GuySpeed
-    if keys[K_RIGHT] and GuyPosx < SCREEN_WIDTH - GuySize[0]:
-        GuyPosx += GuySpeed
-    if keys[K_UP] and GuyPosy > 0:
-        GuyPosy -= GuySpeed
-    if keys[K_DOWN] and GuyPosy < SCREEN_HEIGHT - GuySize[1]:
-        GuyPosy += GuySpeed
+    if keys[K_LEFT] and ZombiePosx > 0:
+        ZombiePosx -= ZombieSpeed
+    if keys[K_RIGHT] and ZombiePosx < SCREEN_WIDTH - ZombieSize[0]:
+        ZombiePosx += ZombieSpeed
+    if keys[K_UP] and ZombiePosy > 0:
+        ZombiePosy -= ZombieSpeed
+    if keys[K_DOWN] and ZombiePosy < SCREEN_HEIGHT - ZombieSize[1]:
+        ZombiePosy += ZombieSpeed
         
+     
     obsPosx += obsSpeed
     if obsPosx <= 0 or obsPosx >= SCREEN_WIDTH - 150:
         obsSpeed *= -1
@@ -72,7 +73,7 @@ while game:
         obs3Speed *= -1
 
     window.blit(background, (0, 0))
-    window.blit(Guy, (GuyPosx, GuyPosy))
+    window.blit(Zombie, (ZombiePosx, ZombiePosy))
     window.blit(Cop, (CopPosx, CopPosy))
     window.blit(obs, (obsPosx, obsPosy))
     window.blit(obs2, (obs2Posx, obs2Posy))
