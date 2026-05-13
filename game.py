@@ -4,6 +4,8 @@ import math # FIX 1: Added this
 SCREEN_WIDTH = 1800
 SCREEN_HEIGHT = 900
 Size = (SCREEN_WIDTH, SCREEN_HEIGHT)
+IconSize = (SCREEN_WIDTH // 13, SCREEN_HEIGHT // 10)
+
 
 window = display.set_mode(Size)
 display.set_caption('Catch Me If You Can')
@@ -19,6 +21,13 @@ obs = transform.scale(image.load('obs.png'),(100,100))
 obs2 = transform.scale(image.load('obs2.png'),(70,70))
 obss = transform.scale(image.load('obs.png'),(100,100))
 
+healthImg = transform.scale(image.load('health.png'),(100,100), IconSize)
+moneyImg = transform.scale(image.load('money.png'),(100,100), IconSize)
+scoreImg = transform.scale(image.load('score.png'),(100,100), IconSize)
+gunsImg = transform.scale(image.load('guns.png'),(100,100), IconSize)
+
+
+mouse.set_visible(False)
 # Player properties
 ZombiePosx = SCREEN_WIDTH // 2 
 ZombiePosy = SCREEN_HEIGHT // 2 
@@ -97,16 +106,26 @@ while game:
     window.blit(obs, (obsPosx, obsPosy))
     window.blit(obs2, (obs2Posx, obs2Posy))
     window.blit(obss, (obssPosx, obssPosy))
+    window.blit(healthImg, (10, SCREEN_HEIGHT - IconSize[1] - 5))
+    window.blit(gunsImg, (IconSize[0]* 2 , SCREEN_HEIGHT- IconSize[1] - 5))
+    window.blit(moneyImg, (IconSize[0] * 4 , SCREEN_HEIGHT - IconSize[1] - 5 ))
+    window.blit(scoreImg, (IconSize[0] * 6, SCREEN_HEIGHT - IconSize[1] - 5))
+
     
     # Cop Rotation and Blit
     rotated_cop = transform.rotate(Cop, cop_angle)
     window.blit(rotated_cop, (CopPosx, CopPosy))
 
-    Zombie_rect = Zombie.get_rect(topleft=(ZombiePosx,ZombiePosy))
-    Cop_rect = Cop.get_rect(topleft=(CopPosx,CopPosy))
-    obss_rect = obss.get_rect(topleft=(obssPosx,obssPosy))
-    obs_rect = obs.get_rect(topleft=(obsPosx,obsPosy))
-
+    Zombie_rect = Zombie.get_rect(topleft=(ZombiePosx, ZombiePosy))
+    Cop_rect = Cop.get_rect(topleft=(CopPosx, CopPosy))
+    obs_rect = obs.get_rect(topleft=(obsPosx, obsPosy))
+    obss_rect = Car.get_rect(topleft=(obssPosx, obssPosy))
+    if Guy_rect.colliderect(Cop_rect) or Guy_rect.colliderect(Car_rect):
+        window.blit(background, (randint(-5, 5), randint(-5, 5)))
+        red = Surface(Size, SRCALPHA)
+        red.fill((255, 0, 0, 80))
+        window.blit(red, (0, 0))
+    
     if Zombie_rect.colliderect(Cop_rect):
         print('caught!')
     if Zombie_rect.colliderect(obs_rect):
