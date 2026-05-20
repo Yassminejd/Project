@@ -5,7 +5,9 @@ from random import randint
 SCREEN_WIDTH = 1800
 SCREEN_HEIGHT = 900
 Size = (SCREEN_WIDTH, SCREEN_HEIGHT)
-IconSize = (SCREEN_WIDTH // 13, SCREEN_HEIGHT // 10)
+
+# Made the icons even larger (400x400 pixels)
+IconSize = (300, 300)
 
 window = display.set_mode(Size)
 display.set_caption('Catch Me If You Can')
@@ -136,10 +138,12 @@ while game:
     window.blit(obs2, (obs2Posx, obs2Posy))
     window.blit(obss, (obssPosx, obssPosy))
     
+    # Aligned tightly on the same side (bottom-left)
+    padding = 10
     window.blit(healthImg, (10, SCREEN_HEIGHT - IconSize[1] - 5))
-    window.blit(gunsImg, (IconSize[0]* 2 , SCREEN_HEIGHT- IconSize[1] - 5))
-    window.blit(moneyImg, (IconSize[0] * 4 , SCREEN_HEIGHT - IconSize[1] - 5 ))
-    window.blit(scoreImg, (IconSize[0] * 6, SCREEN_HEIGHT - IconSize[1] - 5))
+    window.blit(gunsImg, (10 + (IconSize[0] + padding), SCREEN_HEIGHT - IconSize[1] - 5))
+    window.blit(moneyImg, (10 + 2 * (IconSize[0] + padding), SCREEN_HEIGHT - IconSize[1] - 5))
+    window.blit(scoreImg, (10 + 3 * (IconSize[0] + padding), SCREEN_HEIGHT - IconSize[1] - 5))
     
     # Apply full-screen red flash damage effect
     if is_colliding:
