@@ -1,42 +1,43 @@
 from pygame import *
-import math # FIX 1: Added this
+import math 
+from random import randint 
 
 SCREEN_WIDTH = 1800
 SCREEN_HEIGHT = 900
 Size = (SCREEN_WIDTH, SCREEN_HEIGHT)
 IconSize = (SCREEN_WIDTH // 13, SCREEN_HEIGHT // 10)
 
-
 window = display.set_mode(Size)
 display.set_caption('Catch Me If You Can')
 
 background = transform.scale(image.load('Background.png'), Size)
 
-ZombieSize  = (150, 200 )
+ZombieSize = (150, 200)
 CopSize = (200, 200)
 
 Zombie = transform.scale(image.load('Zombie.png'), ZombieSize)
-Cop = transform.scale( image.load('Cop.png') , CopSize )
-obs = transform.scale(image.load('obs.png'),(100,100))
-obs2 = transform.scale(image.load('obs2.png'),(70,70))
-obss = transform.scale(image.load('obs.png'),(100,100))
+Cop = transform.scale(image.load('Cop.png'), CopSize)
+obs = transform.scale(image.load('obs.png'), (100, 100))
+obs2 = transform.scale(image.load('obs2.png'), (70, 70))
+obss = transform.scale(image.load('obs.png'), (100, 100))
 
-healthImg = transform.scale(image.load('health.png'),(100,100), IconSize)
-moneyImg = transform.scale(image.load('money.png'),(100,100), IconSize)
-scoreImg = transform.scale(image.load('score.png'),(100,100), IconSize)
-gunsImg = transform.scale(image.load('guns.png'),(100,100), IconSize)
-
+healthImg = transform.scale(image.load('health.png'), IconSize)
+moneyImg = transform.scale(image.load('money.png'), IconSize)
+scoreImg = transform.scale(image.load('score.png'), IconSize)
+gunsImg = transform.scale(image.load('guns.png'), IconSize)
 
 mouse.set_visible(False)
-# Player properties
+
+# Player properties (Using float/center tracking makes movement smoother)
 ZombiePosx = SCREEN_WIDTH // 2 
 ZombiePosy = SCREEN_HEIGHT // 2 
 ZombieSpeed = 7
+angle = 0
 
 # Enemy properties
 CopPosx = 100
 CopPosy = 100
-CopSpeed = 3 # FIX 2: Set a slower speed here
+CopSpeed = 3 
 
 obsPosx = 200
 obsPosy = 200
@@ -45,18 +46,20 @@ obs2Posx = 400
 obs2Posy = 400
 obs2Speed = 5
 obssPosx = 200
-obssPosy = 600  
+obssPosy = 600   
 obssSpeed = 5
 
 game = True
-angle = 0
-clock = time.Clock() # FIX 3: Initialize the clock
+clock = time.Clock() 
 
 while game:
+    clock.tick(60)
+
     for e in event.get():
         if e.type == QUIT:
             game = False
 
+    # 1. Input & Player Movement
     keys = key.get_pressed()
     if keys[K_LEFT] and ZombiePosx > 0:
         ZombiePosx -= ZombieSpeed
@@ -71,7 +74,7 @@ while game:
         ZombiePosy += ZombieSpeed
         angle = -90
         
-    # Cop chasing logic
+    # 2. Cop chasing logic
     dx = ZombiePosx - CopPosx
     dy = ZombiePosy - CopPosy
     
@@ -88,60 +91,65 @@ while game:
     elif CopPosy > ZombiePosy:
         CopPosy -= CopSpeed
 
-    # Obstacle movement
+    # 3. Obstacle movement
     obsPosx += obsSpeed
-    if obsPosx <= 0 or obsPosx >= SCREEN_WIDTH - 150:
+    if obsPosx <= 0 or obsPosx >= SCREEN_WIDTH - 100: # Adjusted bounding box limit
         obsSpeed *= -1
     obs2Posy += obs2Speed
-    if obs2Posy <= 0 or obs2Posy >= SCREEN_HEIGHT - 150:
+    if obs2Posy <= 0 or obs2Posy >= SCREEN_HEIGHT - 70: # Adjusted bounding box limit
         obs2Speed *= -1
     
     obssPosx += obssSpeed
     if obssPosx <= 0 or obssPosx >= SCREEN_WIDTH - 100:
         obssSpeed *= -1
 
-    # Drawing
-    window.blit(background, (0, 0))
-    window.blit(transform.rotate(Zombie, angle), (ZombiePosx, ZombiePosy))
+    # 4. Setup rectangles BEFORE drawing to detect screen shake status
+    Zombie_rect = Zombie.get_rect(topleft=(ZombiePosx, ZombiePosy))
+    Cop_rect = Cop.get_rect(topleft=(CopPosx, CopPosy))
+    obs_rect = obs.get_rect(topleft=(obsPosx, obsPosy))
+    obs2_rect = obs2.get_rect(topleft=(obs2Posx, obs2Posy)) 
+    obss_rect = obss.get_rect(topleft=(obssPosx, obssPosy))
+
+    is_colliding = (Zombie_rect.colliderect(Cop_rect) or 
+                    Zombie_rect.colliderect(obs_rect) or 
+                    Zombie_rect.colliderect(obs2_rect) or 
+                    Zombie_rect.colliderect(obss_rect))
+
+    # 5. Drawing Section
+    # Calculate screen shake offset up front
+    shake_x = randint(-5, 5) if is_colliding else 0
+    shake_y = randint(-5, 5) if is_colliding else 0
+
+    window.blit(background, (shake_x, shake_y))
+    
+    # Rotate characters properly around their center points
+    rotated_zombie = transform.rotate(Zombie, angle)
+    zombie_rot_rect = rotated_zombie.get_rect(center=Zombie_rect.center)
+    window.blit(rotated_zombie, zombie_rot_rect)
+    
+    rotated_cop = transform.rotate(Cop, cop_angle)
+    cop_rot_rect = rotated_cop.get_rect(center=Cop_rect.center)
+    window.blit(rotated_cop, cop_rot_rect)
+
+    # Draw Obstacles & UI
     window.blit(obs, (obsPosx, obsPosy))
     window.blit(obs2, (obs2Posx, obs2Posy))
     window.blit(obss, (obssPosx, obssPosy))
+    
     window.blit(healthImg, (10, SCREEN_HEIGHT - IconSize[1] - 5))
     window.blit(gunsImg, (IconSize[0]* 2 , SCREEN_HEIGHT- IconSize[1] - 5))
     window.blit(moneyImg, (IconSize[0] * 4 , SCREEN_HEIGHT - IconSize[1] - 5 ))
     window.blit(scoreImg, (IconSize[0] * 6, SCREEN_HEIGHT - IconSize[1] - 5))
-
     
-    # Cop Rotation and Blit
-    rotated_cop = transform.rotate(Cop, cop_angle)
-    window.blit(rotated_cop, (CopPosx, CopPosy))
-
-    Zombie_rect = Zombie.get_rect(topleft=(ZombiePosx, ZombiePosy))
-    Cop_rect = Cop.get_rect(topleft=(CopPosx, CopPosy))
-    obs_rect = obs.get_rect(topleft=(obsPosx, obsPosy))
-    obss_rect = Car.get_rect(topleft=(obssPosx, obssPosy))
-    if Guy_rect.colliderect(Cop_rect) or Guy_rect.colliderect(Car_rect):
-        window.blit(background, (randint(-5, 5), randint(-5, 5)))
+    # Apply full-screen red flash damage effect
+    if is_colliding:
         red = Surface(Size, SRCALPHA)
         red.fill((255, 0, 0, 80))
         window.blit(red, (0, 0))
+        
+        if Zombie_rect.colliderect(Cop_rect):
+            print('caught!')
+        else:
+            print('hit by an obstacle')
     
-    if Zombie_rect.colliderect(Cop_rect):
-        print('caught!')
-    if Zombie_rect.colliderect(obs_rect):
-        print('hit by the obstacle')
-    if Zombie_rect.colliderect(obss_rect):
-        print('hit by the obstacle')
-    
-    
-
-
-
-
-
-
-
-
-
-
     display.update()
